@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/wait.h>
 
 #define NAME_SIZE 50
 #define CATEGORY_SIZE 30
@@ -396,6 +397,30 @@ void remove_report(const char *district,int raport_id)
     close(f);
 }
 
+void remove_district (const char *district)
+{
+    char link_name[LINK_SIZE];
+    snprintf(link_name,sizeof(link_name),"active_reports-%s",district);
+    unlink(link_name);
+
+    pid_t pid=fork();
+    if (pid<0)
+    {
+        perror("fork failed\n");
+        exit(1);
+    }
+    if (pid==0) //cod fiu
+    {
+        execlp("rm","rm","-rf",district,NULL);
+
+        perror("execlp a esuat\n");
+        exit(-1);
+    }
+    //codparinte
+    wait(NULL);
+    printf("District %s removed \n",district);
+}
+
 int parse_condition(const char *input, char *field, char *op, char *value)
 {
     // copiem input-ul ca sa nu il modificam
@@ -638,7 +663,7 @@ int main(int argc,char *argv[]) {
                         }
                         if (argc < 8)
                         {
-                            fprintf(stderr, "Eroare: trebuie specificata un index pentru stergere\n");
+                            fprintf(stderr, "Eroare: trebuie specificata un index pentru stergere report\n");
                             return 1;
                         }
                         if (check_permission(path_reports, role, 'w') == 0)
@@ -672,9 +697,24 @@ int main(int argc,char *argv[]) {
                         }
                         else
                         {
-                            printf("Eroare:Comanda %s este necunoscuta\n",comand);
-                            return 1;
+                            if (strcmp (comand, "--remove_district") == 0)
+                            {
+                                if (strcmp(role, "manager") == 0)
+                                {
+                                    remove_district(district);
+                                }
+                                else
+                                {
+                                    printf("Eroare: %s nu are dreptul de a sterge",user);
+                                }
+                            }
+                            else
+                            {
+                                printf("Eroare:Comanda %s este necunoscuta\n",comand);
+                                return 1;
+                            }
                         }
+
                     }
 
                 }

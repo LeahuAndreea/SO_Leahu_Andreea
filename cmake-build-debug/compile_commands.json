@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/vboxuser/CLionProjects/SO_Leahu_Andreea/cmake-build-debug",
+  "command": "/usr/bin/cc   -g -std=gnu11 -fdiagnostics-color=always -o CMakeFiles/etapa1.dir/main.c.o -c /home/vboxuser/CLionProjects/SO_Leahu_Andreea/main.c",
+  "file": "/home/vboxuser/CLionProjects/SO_Leahu_Andreea/main.c",
+  "output": "CMakeFiles/etapa1.dir/main.c.o"
+}
+]
