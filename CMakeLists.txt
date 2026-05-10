@@ -3,4 +3,5 @@ project(etapa1 C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(etapa1 main.c)
+add_executable(etapa1 main.c
+        " monitor_reports.c")

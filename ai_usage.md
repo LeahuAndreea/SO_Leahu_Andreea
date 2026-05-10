@@ -1,3 +1,4 @@
+FAZA 1
 1) Ce instrument am folosit?
     1) Am utilizat Claude (claude.ai)
 2) Prompt-uri date?
@@ -22,3 +23,10 @@
 5) Ce am invatat?
     1) E necesar sa verific ce genereaza inteligenta artificila,
        pot aparea erori
+
+FAZA 2
+
+1) L-am folosit pt debugging
+cand incercam sa leg monitorul de city_manager. Nu intelegem exact de unde provin eroari de la compilator. Astfel am aprofundat mai bine si modul in care acesta functioneaza.
+
+2) Am cerut o explicatie despre structura sigaction si cum pot preveni intreruperea apelurilor de sistem. Asadar, am utilizat o masca de semnale si flag

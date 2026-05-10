@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/wait.h>
 
 #define NAME_SIZE 50
 #define CATEGORY_SIZE 30
@@ -396,6 +397,30 @@ void remove_report(const char *district,int raport_id)
     close(f);
 }
 
+void remove_district (const char *district)
+{
+    char link_name[LINK_SIZE];
+    snprintf(link_name,sizeof(link_name),"active_reports-%s",district);
+    unlink(link_name);
+
+    pid_t pid=fork();
+    if (pid<0)
+    {
+        perror("fork failed\n");
+        exit(1);
+    }
+    if (pid==0) //cod fiu
+    {
+        execlp("rm","rm","-rf",district,NULL);
+
+        perror("execlp a esuat\n");
+        exit(-1);
+    }
+    //codparinte
+    wait(NULL);
+    printf("District %s removed \n",district);
+}
+
 int parse_condition(const char *input, char *field, char *op, char *value)
 {
     // copiem input-ul ca sa nu il modificam
@@ -526,6 +551,40 @@ int check_permission(const char *path, const char *role, char action)
     return 0;
 }
 
+void notify_monitor(const char *district, const char *user, const char *role)
+{
+    int f;
+    int monitor_informed=0;
+    f=open (".monitor_pid",O_RDONLY);
+    if (f!=-1)
+    {
+        char pid_str[10];
+        int bytes=read(f,pid_str,sizeof(pid_str)-1);
+        close(f);
+        if (bytes>0)
+        {
+            pid_str[bytes]='\0';
+            pid_t monitor_pid=atoi(pid_str);
+
+            if (kill(monitor_pid,SIGUSR1)==0)
+                monitor_informed=1;
+        }
+    }
+    char text[100];
+    if (monitor_informed!=0)
+    {
+        snprintf(text, sizeof(text),"Add report. monitor informed\n");
+        printf("Monitorul a fost informat\n");
+    }
+    else
+    {
+        snprintf(text, sizeof(text),"Add report. monitor could not be informed\n");
+        fprintf(stderr,"Monitorul NU a fost informat!\n");
+    }
+    add_logged_district(district,user,role,text);
+
+}
+
 
 int main(int argc,char *argv[]) {
     if (argc < 7)
@@ -565,7 +624,7 @@ int main(int argc,char *argv[]) {
         add_report(district,user);
         if (strcmp(role,"manager")==0)
         {
-            add_logged_district(district,user,role,"add");
+            notify_monitor(district,user,role);
         }
     }
     else
@@ -638,7 +697,7 @@ int main(int argc,char *argv[]) {
                         }
                         if (argc < 8)
                         {
-                            fprintf(stderr, "Eroare: trebuie specificata un index pentru stergere\n");
+                            fprintf(stderr, "Eroare: trebuie specificata un index pentru stergere report\n");
                             return 1;
                         }
                         if (check_permission(path_reports, role, 'w') == 0)
@@ -672,9 +731,24 @@ int main(int argc,char *argv[]) {
                         }
                         else
                         {
-                            printf("Eroare:Comanda %s este necunoscuta\n",comand);
-                            return 1;
+                            if (strcmp (comand, "--remove_district") == 0)
+                            {
+                                if (strcmp(role, "manager") == 0)
+                                {
+                                    remove_district(district);
+                                }
+                                else
+                                {
+                                    printf("Eroare: %s nu are dreptul de a sterge",user);
+                                }
+                            }
+                            else
+                            {
+                                printf("Eroare:Comanda %s este necunoscuta\n",comand);
+                                return 1;
+                            }
                         }
+
                     }
 
                 }
