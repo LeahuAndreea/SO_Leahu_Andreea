@@ -65,4 +65,5 @@ int main (int argc, char *argv[])
         printf("inspector: %s \t scor total: %d\n", scoruri[i].nume,scoruri[i].score);
     }
     return 0;
+
 }
