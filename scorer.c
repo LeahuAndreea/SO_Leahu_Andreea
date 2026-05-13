@@ -23,7 +23,9 @@ int main (int argc, char *argv[])
     }
 
     char path [PATH];
-    snprintf(path,O_RDONLY);
+    snprintf(path,sizeof(path),"%s/reports.dat",argv[1]);
+    int f;
+    f=open(path,O_RDONLY);
     if ( f==-1)
     {
         printf("Scorer [%s] nu a putut fi gasit",argv[1]);
