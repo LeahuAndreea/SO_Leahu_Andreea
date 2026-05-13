@@ -1,9 +1,4 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<unistd.h>
-#include<fcntl.h>
-#include<signal.h>
+#include "biblioteca.h"
 
 #define PID_FILE ".monitor_pid"
 #define text_size 100
